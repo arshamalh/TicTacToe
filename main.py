@@ -74,27 +74,30 @@ board = GameBoard(3, 3)
 # cycle players between players number 1 and 2.
 player_cyc = cycle([1, 2])
 place_filled = 0
+def getPosition(pl):
+    position = input(f'player {pl} please enter your position: ')
+    position = position.replace(',', " ")
+    position = position.replace('.', " ")
+    position = position.replace('/', " ")
+    position = position.replace('-', " ")
+    return position.split(' ')
+
 while True:
     pl = next(player_cyc)
     list_of_choices = []
+
+    # TODO: Why two while True inside another while true!? It that really needed?
     while True:
         if len(list_of_choices) != 2:
-            position = input(f'player {pl} please enter your position: ')
-            if ',' in position:
-                position = position.split(',')
-            elif ' ' in position:
-                position = position.split(' ')
-            elif '.' in position:
-                position = position.split('.')
+            position = getPosition(pl)
             list_of_choices = [int(ch) for ch in position if ch.isnumeric()]
-
         else:
             break
+
     while True:
         if not board.filler(pl, list_of_choices):
             print('that place is filled, please select somewhere else')
-            position = input(
-                f'player {pl} please enter your position: ').split(',')
+            position = getPosition(pl)
             list_of_choices = [int(ch) for ch in position if ch.isnumeric()]
         else:
             break
