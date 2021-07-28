@@ -39,10 +39,10 @@ class GameBoard:
         oPlayer = "O"
         winnerX = False
         winnerO = False
-        def checkWinner(winnerX, winnerO): # has winner, winner
-          if winnerX:
+        def checkWinner(Wx, Wo): # has winner, winner
+          if Wx:
             return 'Player 1 is winner'
-          elif winnerO:
+          elif Wo:
             return 'Player 2 is winner'
           else:
             return False
@@ -69,9 +69,6 @@ class GameBoard:
           return True, checkWinner(winnerX, winnerO)
 
         return False, ""
-
-    
-    
 
 board = GameBoard(3, 3)
 # cycle players between players number 1 and 2.
@@ -113,8 +110,8 @@ while True:
         print('No player won, play again!')
 
 
-# TODO: can it be a package? so make it simpler to understand and documented
 # TODO: make everything happened in class an while loop in play method
+# TODO: can it be a package? so make it simpler to understand and documented
 # TODO: don't repeat, line 75 and 89 are same (position input)
 # TODO: it has to work for bigger GameBords (the problem is with cheker)
 # TODO: make a toturial how did you do this
