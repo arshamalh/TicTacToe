@@ -1,44 +1,41 @@
 from itertools import cycle
+import re
 
 class GameBoard:
 
-    sign = 'X'
-    matrix = []
-
-    def __init__(self, row, column):
-        self.size = [row, column]
+    def __init__(self):
         self.shape = ''
-        self.matrix = [['-' for _ in range(self.size[1])]
-                       for _ in range(self.size[0])]
+        self.signTurn = 'X'
+        self.player_cyc = cycle([1, 2])
+        self.placeFilled = 0
+        self.matrix = [['-' for _ in range(3)] for _ in range(3)]
 
     def drawer(self):
         self.shape = ''
-        for i in range(self.size[0]):
-            self.shape += ' ---' * self.size[1] + '\n'
-            for j in range(self.size[1]):
+        for i in range(3):
+            self.shape += ' ---' * 3 + '\n'
+            for j in range(3):
                 self.shape += f'| {self.matrix[i][j]} '
             self.shape += '|' + '\n'
-        self.shape += ' ---' * self.size[1] + '\n'
+        self.shape += ' ---' * 3 + '\n'
         return self.shape
 
     def filler(self, player, choice):
         if self.matrix[choice[0] - 1][choice[1] - 1] == '-':
             if player == 1:
-                self.sign = 'X'
+                self.signTurn = 'X'
             elif player == 2:
-                self.sign = 'O'
+                self.signTurn = 'O'
             else:
+                # TODO: Fix it!
                 print('I have some problems with Player number!')
-            self.matrix[choice[0] - 1][choice[1] - 1] = self.sign
+            self.matrix[choice[0] - 1][choice[1] - 1] = self.signTurn
             return True
         else:
             return False
 
     def checker(self):
-        xPlayer = "X"
-        oPlayer = "O"
-        winnerX = False
-        winnerO = False
+        xPlayer, oPlayer, winnerX, winnerO = "X", "O", False, False
         def checkWinner(Wx, Wo): # has winner, winner
           if Wx:
             return 'Player 1 is winner'
@@ -46,6 +43,7 @@ class GameBoard:
             return 'Player 2 is winner'
           else:
             return False
+
         # like ---
         for i in self.matrix:
           winnerX = i[0] == i[1] == i[2] == xPlayer
@@ -70,51 +68,42 @@ class GameBoard:
 
         return False, ""
 
-board = GameBoard(3, 3)
-# cycle players between players number 1 and 2.
-player_cyc = cycle([1, 2])
-place_filled = 0
-def getPosition(pl):
-    position = input(f'player {pl} please enter your position: ')
-    position = position.replace(',', " ")
-    position = position.replace('.', " ")
-    position = position.replace('/', " ")
-    position = position.replace('-', " ")
-    return position.split(' ')
+    @property
+    def player(self): return next(self.player_cyc)
+
+
+board = GameBoard()
+player_cyc = cycle([1, 2]) # cycle players between players number 1 and 2.
+def getCordination(pl):
+    # Get user input and replace anything except 0-9
+    position = re.sub("[^1-3]", "", input(f'player {pl} please enter your position: '))
+    cordination = [int(ch) for ch in position]
+    return cordination
 
 while True:
-    pl = next(player_cyc)
-    list_of_choices = []
+    pl = board.player
+    cordination = getCordination(pl)
 
-    # TODO: Why two while True inside another while true!? It that really needed?
-    while True:
-        if len(list_of_choices) != 2:
-            position = getPosition(pl)
-            list_of_choices = [int(ch) for ch in position if ch.isnumeric()]
-        else:
-            break
+    while len(cordination) != 2: 
+        print('Cordination is wrong! try somewhere else.')
+        cordination = getCordination(pl)
 
-    while True:
-        if not board.filler(pl, list_of_choices):
-            print('that place is filled, please select somewhere else')
-            position = getPosition(pl)
-            list_of_choices = [int(ch) for ch in position if ch.isnumeric()]
-        else:
-            break
+    while not board.filler(pl, cordination): 
+        print('Coordination is filled, try somewhere else.')
+        cordination = getCordination(pl)
+
+    board.placeFilled += 1
     print(board.drawer())
-    place_filled += 1
-    print(f'{place_filled} place is filled')
-    if place_filled > 4:
+    print(f'{board.placeFilled} place is filled')
+    if board.placeFilled > 4:
         checked, pl_winner = board.checker()
         if checked:
             print(f'{pl_winner}')
             break
-    if place_filled == 9:
-        print('No player won, play again!')
+        elif board.placeFilled == 9:
+            print('No player won, play again!')
 
-
-# TODO: make everything happened in class an while loop in play method
-# TODO: can it be a package? so make it simpler to understand and documented
-# TODO: don't repeat, line 75 and 89 are same (position input)
-# TODO: it has to work for bigger GameBords (the problem is with cheker)
-# TODO: make a toturial how did you do this
+# TODO: Make everything happened in class an while loop in play method
+# TODO: Can it be a package? so make it simpler to understand and documented
+# TODO: Don't repeat, line 75 and 89 are same (position input)
+# TODO: It has to work for bigger GameBords (the problem is with cheker)
