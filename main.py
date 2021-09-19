@@ -3,9 +3,10 @@ import re
 
 class GameBoard:
 
+    x = "X"
+    o = "O"
+
     def __init__(self):
-        self.shape = ''
-        self.signTurn = 'X'
         self.player_cyc = cycle([1, 2])
         self.placeFilled = 0
         self.matrix = [['-' for _ in range(3)] for _ in range(3)]
@@ -21,52 +22,31 @@ class GameBoard:
         return self.shape
 
     def filler(self, player, choice):
-        if self.matrix[choice[0] - 1][choice[1] - 1] == '-':
-            if player == 1:
-                self.signTurn = 'X'
-            elif player == 2:
-                self.signTurn = 'O'
-            else:
-                # TODO: Fix it!
-                print('I have some problems with Player number!')
-            self.matrix[choice[0] - 1][choice[1] - 1] = self.signTurn
-            return True
-        else:
-            return False
+        if self.matrix[choice[0] - 1][choice[1] - 1] != '-': return False
+        self.matrix[choice[0] - 1][choice[1] - 1] = self.x if player == 1 else self.o
+        return True
 
     def checker(self):
-        xPlayer, oPlayer, winnerX, winnerO = "X", "O", False, False
-        def checkWinner(Wx, Wo): # has winner, winner
-          if Wx:
-            return 'Player 1 is winner'
-          elif Wo:
-            return 'Player 2 is winner'
-          else:
-            return False
+        winner = {1: False, 2: False}
 
         # like ---
         for i in self.matrix:
-          winnerX = i[0] == i[1] == i[2] == xPlayer
-          winnerO = i[0] == i[1] == i[2] == oPlayer
-          if checkWinner(winnerX, winnerO):
-            return True, checkWinner(winnerX, winnerO)
+          winner[1] = i[0] == i[1] == i[2] == self.x
+          winner[2] = i[0] == i[1] == i[2] == self.o
+          if winner[1] or winner[2]: return winner
 
         # like |
         for i in range(3):
-          winnerX = self.matrix[0][i] == self.matrix[1][i] == self.matrix[2][i] == xPlayer
-          winnerO = self.matrix[0][i] == self.matrix[1][i] == self.matrix[2][i] == oPlayer
+          winner[1] = self.matrix[0][i] == self.matrix[1][i] == self.matrix[2][i] == self.x
+          winner[2] = self.matrix[0][i] == self.matrix[1][i] == self.matrix[2][i] == self.o
+          if winner[1] or winner[2]: return winner
 
-          if checkWinner(winnerX, winnerO):
-            return True, checkWinner(winnerX, winnerO)
+        # like \ or /
+        winner[1] = self.matrix[0][0] == self.matrix[1][1] == self.matrix[2][2] == self.x or self.matrix[0][2] == self.matrix[1][1] == self.matrix[2][0] == self.x
+        winner[2] = self.matrix[0][0] == self.matrix[1][1] == self.matrix[2][2] == self.o or self.matrix[0][2] == self.matrix[1][1] == self.matrix[2][0] == self.o
+        if winner[1] or winner[2]: return winner
 
-        # like this: \ and /
-        winnerX = self.matrix[0][0] == self.matrix[1][1] == self.matrix[2][2] == xPlayer or self.matrix[0][2] == self.matrix[1][1] == self.matrix[2][0] == xPlayer
-        winnerO = self.matrix[0][0] == self.matrix[1][1] == self.matrix[2][2] == oPlayer or self.matrix[0][2] == self.matrix[1][1] == self.matrix[2][0] == oPlayer
-
-        if checkWinner(winnerX, winnerO):
-          return True, checkWinner(winnerX, winnerO)
-
-        return False, ""
+        return False
 
     @property
     def player(self): return next(self.player_cyc)
@@ -93,12 +73,11 @@ while True:
         cordination = getCordination(pl)
 
     board.placeFilled += 1
-    print(board.drawer())
-    print(f'{board.placeFilled} place is filled')
+    print(board.drawer(), f'\n {board.placeFilled} place is filled')
     if board.placeFilled > 4:
-        checked, pl_winner = board.checker()
-        if checked:
-            print(f'{pl_winner}')
+        winner = board.checker()
+        if winner:
+            print(f'Player 1 has won!') if winner[1] else print(f'Player 2 has won!')
             break
         elif board.placeFilled == 9:
             print('No player won, play again!')
