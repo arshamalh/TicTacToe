@@ -2,15 +2,12 @@ from itertools import cycle
 import re
 
 class GameBoard:
-
-    x = "X"
-    o = "O"
-
     def __init__(self):
         self.player_cyc = cycle([1, 2])
         self.placeFilled = 0
         self.Input = input
         self.Print = print
+        self.x, self.o = "X", "O"
         self.matrix = [['-' for _ in range(3)] for _ in range(3)]
 
     def drawer(self):
@@ -82,11 +79,8 @@ class GameBoard:
     @property
     def player(self): return next(self.player_cyc)
 
-    def setInPrint(self, Input=input, Print=print):
-        # Input function will get an argument an show it to user, it should return user input
-        # Print function will get an argument an show it to user
-        self.Input = Input
-        self.Print = Print
+    def setInPrint(self, Input=input, Print=print): self.Input, self.Print = Input, Print
+    def setXO(self, X = "X", O = "O"): self.x, self.o = X, O
 
 board = GameBoard()
 board.play()
