@@ -76,11 +76,12 @@ class GameBoard:
         cordination = [int(ch) for ch in position]
         return cordination
 
+    def setInPrint(self, Input=input, Print=print): self.Input, self.Print = Input, Print
+    def setXO(self, X = "X", O = "O"): self.x, self.o = X, O
+    
     @property
     def player(self): return next(self.player_cyc)
 
-    def setInPrint(self, Input=input, Print=print): self.Input, self.Print = Input, Print
-    def setXO(self, X = "X", O = "O"): self.x, self.o = X, O
 
 board = GameBoard()
 board.play()
