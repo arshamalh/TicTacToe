@@ -9,6 +9,8 @@ class GameBoard:
     def __init__(self):
         self.player_cyc = cycle([1, 2])
         self.placeFilled = 0
+        self.Input = input
+        self.Print = print
         self.matrix = [['-' for _ in range(3)] for _ in range(3)]
 
     def drawer(self):
@@ -48,41 +50,43 @@ class GameBoard:
 
         return False
 
+    def play(self):
+        while True:
+            pl = self.player
+            cordination = self.getCordination(pl)
+
+            while len(cordination) != 2: 
+                self.Print('Cordination is wrong! try somewhere else.')
+                cordination = self.getCordination(pl)
+
+            while not self.filler(pl, cordination): 
+                self.Print('Coordination is filled, try somewhere else.')
+                cordination = self.getCordination(pl)
+
+            self.placeFilled += 1
+            self.Print(self.drawer(), f'\n {self.placeFilled} place is filled')
+            if self.placeFilled > 4:
+                winner = self.checker()
+                if winner:
+                    self.Print(f'Player 1 has won!') if winner[1] else self.Print(f'Player 2 has won!')
+                    break
+                elif self.placeFilled == 9:
+                    self.Print('No player won, play again!')
+
+    def getCordination(self, pl):
+        # Get user input and replace anything except 0-9
+        position = re.sub("[^1-3]", "", self.Input(f'player {pl} please enter your position: '))
+        cordination = [int(ch) for ch in position]
+        return cordination
+
     @property
     def player(self): return next(self.player_cyc)
 
+    def setInPrint(self, Input=input, Print=print):
+        # Input function will get an argument an show it to user, it should return user input
+        # Print function will get an argument an show it to user
+        self.Input = Input
+        self.Print = Print
 
 board = GameBoard()
-player_cyc = cycle([1, 2]) # cycle players between players number 1 and 2.
-def getCordination(pl):
-    # Get user input and replace anything except 0-9
-    position = re.sub("[^1-3]", "", input(f'player {pl} please enter your position: '))
-    cordination = [int(ch) for ch in position]
-    return cordination
-
-while True:
-    pl = board.player
-    cordination = getCordination(pl)
-
-    while len(cordination) != 2: 
-        print('Cordination is wrong! try somewhere else.')
-        cordination = getCordination(pl)
-
-    while not board.filler(pl, cordination): 
-        print('Coordination is filled, try somewhere else.')
-        cordination = getCordination(pl)
-
-    board.placeFilled += 1
-    print(board.drawer(), f'\n {board.placeFilled} place is filled')
-    if board.placeFilled > 4:
-        winner = board.checker()
-        if winner:
-            print(f'Player 1 has won!') if winner[1] else print(f'Player 2 has won!')
-            break
-        elif board.placeFilled == 9:
-            print('No player won, play again!')
-
-# TODO: Make everything happened in class an while loop in play method
-# TODO: Can it be a package? so make it simpler to understand and documented
-# TODO: Don't repeat, line 75 and 89 are same (position input)
-# TODO: It has to work for bigger GameBords (the problem is with cheker)
+board.play()
